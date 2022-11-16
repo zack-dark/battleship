@@ -5,7 +5,9 @@ import sys
 
 
 # a code template for creating objects
+
 # A class in Python is a category or set of different elements grouped together that share one or more similarities with one another, but yet distinct from other classes via type, quality and kind. In technical terminology, we can define a class in Python as being a blueprint for individual objects with same or exact behavior.
+
 class Computer_Move:
     # if variable_1 is set to anything non-empty, then use its value, otherwise use 0
     rows = 0
@@ -21,6 +23,7 @@ class Computer_Move:
     count_S = 4
     count_D = 2
     input = {}
+
     #letters=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 
     # The self in keyword in Python is used to all the instances in a class. By using the self keyword, one can easily access all the instances defined within a class, including its methods and attributes.
@@ -73,7 +76,6 @@ class Computer_Move:
 
 
                 # Letter (If letter is same and number is different)
-                #TODO:
                 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
                            's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
@@ -112,7 +114,7 @@ class Computer_Move:
 
 
                 # All Possibilities (If Number is same and letter is different)
-                #TODO:
+
                 letters =['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
                            's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
@@ -191,8 +193,7 @@ class Computer_Move:
                 start_carrier_number = int(start_carrier[1:]) - 1
                 end_carrier_number = int(end_carrier[1:]) - 1
 
-                if (
-                        computer_guess_number - 1 >= start_carrier_number and computer_guess_number - 1 <= end_carrier_number) and (
+                if (computer_guess_number - 1 >= start_carrier_number and computer_guess_number - 1 <= end_carrier_number) and (
                         computer_guess_letter >= start_carrier_letter and computer_guess_letter <= end_carrier_letter):
                     self.count_Carrier = self.count_Carrier - 1
                 else:
@@ -203,6 +204,19 @@ class Computer_Move:
                 self.count_D = self.count_D - 1
 
             if self.count_B == 0 or self.count_S == 0 or self.count_D == 0 or self.count_Cruiser == 0 or self.count_Carrier == 0:
+
+                file = open("Summary_Log", 'a')
+                file.write("\n---The computer sunk ships:---")
+                if self.count_B == 0:file.write("\nBattleship sank")
+                if self.count_S == 0:file.write("\nSubmarine sank")
+                if self.count_D == 0:file.write("\nDestroyer sank")
+                if self.count_Cruiser == 0:file.write("\nCruiser sank")
+                if self.count_Carrier == 0:file.write("\nCarrier sank")
+                file.write("\n---The winner is the Computer.---")
+
+                file.close()
+
+                self.print_Grid()
                 print("You Lost!", end="")
                 self.rows = 0
                 self.cols = 0
@@ -263,30 +277,29 @@ class Human_Move:
     count_D = 2
     input = {}
 
+
     def quit_f(self, value):
-        if value.lower() == "quit":
-            print("Program terminating.\nSee summary log file for results of playing Battleship.\nThank you for playing Battleship!")
+        if value.lower() == "quit" or value.lower() == "exit":
+            print("Program terminating.\n"+
+            "See summary log file for results of playing Battleship.\n"+
+                  "Thank you for playing Battleship!")
             sys.exit(0)
 
 
     def start(self):
-        #TODO:input
         height_is_int = True
         length_is_int = True
 
         height = input("Before we begin playing, set the size of the ocean. Enter Height of Ocean Grid : ")
         while height_is_int:
-
             self.quit_f(height)
-
             try:
                 height = int(height)
                 height_is_int = False
             except Exception:
                 print("Invalid value!")
                 height = input("Before we begin playing, set the size of the ocean. Enter Height of Ocean Grid : ")
-
-            if int(height) < 10 :
+            if int(height) < 10:
 
                 print("Height should be greater than or equal to 10")
                 # print("Length should be greater than or equal to 10")
@@ -299,7 +312,6 @@ class Human_Move:
 
 
         length = input("Enter Length of Ocean Grid : ")
-
         while length_is_int:
             self.quit_f(length)
             try:
@@ -308,7 +320,6 @@ class Human_Move:
             except Exception:
                 print("Invalid value!")
                 length = input("Enter Length of Ocean Grid : ")
-
             if int(length) < 10 or int(length) > 27:
                 # print("Height should be greater than or equal to 10")
                 print("Length should be greater than or equal to 10")
@@ -330,13 +341,22 @@ class Human_Move:
         self.rows, self.cols = (height, length)
 
         file = open("Summary_Log", 'a')
-        file.write("Dimensions\n1) Height : " + str(self.rows) + "\n2) Length : " + str(self.cols))
+        file.write("Dimensions\n1) Height : " + str(self.rows) +
+                   "\n2) Length : " + str(self.cols))
         file.close()
 
         self.primary_arr = [['.' for x in range(self.cols)] for y in range(self.rows)]
         self.tracking_arr = [['.' for x in range(self.cols)] for y in range(self.rows)]
         print("******** Welcome to BattleShip Game ********")
         self.print_Grid()
+        self.Place_Ship()
+
+    def info_repeat_place_ship(self):
+        print("You must specify in this specific order: (shipType bowCoord sternCoord)")
+        print("•	the type of the ship first, (Carrier, Battleship, Cruiser, Submarine, Destroyer)")
+        print("•	coordinates of the bow (the front of the ship) second")
+        print("•	the coordinates of the stern (the back of the ship) last")
+
         self.Place_Ship()
 
     def Place_Ship(self):
@@ -351,14 +371,15 @@ class Human_Move:
                 if self.ships[i].lower() not in self.ship_name:
                     print("1", self.ships[i], "\b, ", end="")
             print('\b\b')
-            # TODO:input
+
             ship_information = input("Place a ship of your fleet: ")
             self.quit_f(ship_information)
 
-            if ship_information.split(" ")[0].lower() in self.ship_name:
-                self.Illegal_Placement()
-            #elif (len(ship_information.split(" ")) != 3):
+            if ship_information.split(" ")[0].lower() in self.ship_name and (len(ship_information.split(" ")) != 3):
+                self.info_repeat_place_ship()
 
+            elif ship_information.split(" ")[0].lower() in self.ship_name:
+                self.Illegal_Placement()
             elif (len(ship_information.split(" ")) == 3):
                 self.ship_name.append(ship_information.split(" ")[0].lower())
                 ship_starting_point = ship_information.split(" ")[1].lower()
@@ -366,14 +387,14 @@ class Human_Move:
 
                 # Add Ship in input dictionary
                 self.input[self.ship_name[-1]] = str(ship_starting_point), str(ship_ending_point)
-
-                self.Placement(ship_starting_point, ship_ending_point)
+                try:
+                    self.Placement(ship_starting_point, ship_ending_point)
+                except Exception as e:
+                    # self.ship_name.pop()
+                    self.info_repeat_place_ship()
 
             else:
-                print("The player must specify in this specific order:")
-                print("•	the type of the ship first, (Carrier, Battleship, Cruiser, Submarine, Destroyer)")
-                print("•	coordinates of the bow (the front of the ship) second")
-                print("•	the coordinates of the stern (the back of the ship) last")
+                self.info_repeat_place_ship()
 
 
     def Placement(self, ship_starting_point, ship_ending_point):
@@ -436,15 +457,34 @@ class Human_Move:
         self.Guess()
 
     def Guess(self):
-        # TODO:input
-        guess = input("Guess Target Space : ").lower()
+        guess = input("Guess Target Space : (TAPE HELP IF YOU WANT TO SEE THE GRID)").lower()
+        if guess.lower() == "help":
+            self.print_Grid()
+        # guess = input("Guess Target Space : ").lower()
         self.quit_f(guess)
-        file = open("Summary_Log", 'a')
-        file.write("\nHuman Guess : " + guess)
-        file.close()
+        guess1_is_int = True
+        guess2_is_int = True
+        while guess1_is_int:
+            try:
+                guess1 = int(guess[1:])
+                guess1_is_int = False
+            except Exception:
+                print("Invalid value!")
+                guess = input("Guess Target Space : ").lower()
+        while guess2_is_int:
+            try:
+                guess1 = int(guess[:1])
+                print("Invalid value!")
+                guess = input("Guess Target Space : ").lower()
+            except Exception:
+                guess2_is_int = False
 
         human_guess_letter = ord(guess[0]) - 96
         human_guess_number = int(guess[1:])
+
+        file = open("Summary_Log", 'a')
+        file.write("\nHuman Guess : " + guess)
+        file.close()
 
         # -1 because rows and columns starts from 0
         if self.c.computer_primary_arr[human_guess_number - 1][human_guess_letter - 1] == ".":
@@ -470,8 +510,7 @@ class Human_Move:
                 end_carrier_number = int(end_carrier[1:])
                 # fix this part double print (this is fixed)
 
-                if (
-                        human_guess_number - 1 >= start_carrier_number and human_guess_number - 1 <= end_carrier_number) and (
+                if (human_guess_number - 1 >= start_carrier_number and human_guess_number - 1 <= end_carrier_number) and (
                         human_guess_letter - 1 >= start_carrier_letter and human_guess_letter - 1 <= end_carrier_letter):
                     self.count_Carrier = self.count_Carrier - 1
                 else:
@@ -481,6 +520,25 @@ class Human_Move:
             elif letter == 'D':
                 self.count_D = self.count_D - 1
             if self.count_B == 0 or self.count_S == 0 or self.count_D == 0 or self.count_Cruiser == 0 or self.count_Carrier == 0:
+                file = open("Summary_Log", 'a')
+                file.write("\n---Your sunk ships:---")
+                if self.count_B == 0: file.write("\nBattleship sank")
+                if self.count_S == 0: file.write("\nSubmarine sank")
+                if self.count_D == 0: file.write("\nDestroyer sank")
+                if self.count_Cruiser == 0: file.write("\nCruiser sank")
+                if self.count_Carrier == 0: file.write("\nCarrier sank")
+                file.write("\n---The computer sunk ships:---")
+                if self.c.count_B == 0: file.write("\nBattleship sank")
+                if self.c.count_S == 0: file.write("\nSubmarine sank")
+                if self.c.count_D == 0: file.write("\nDestroyer sank")
+                if self.c.count_Cruiser == 0: file.write("\nCruiser sank")
+                if self.c.count_Carrier == 0: file.write("\nCarrier sank")
+                file.write("\n---You win.---")
+                file.close()
+                print("---Computer Grid---")
+                self.c.print_Grid()
+                print("---Your Grid---")
+                self.print_Grid()
                 print("You Won!", end="")
                 self.rows = 0
                 self.cols = 0
@@ -529,10 +587,13 @@ class Human_Move:
 if __name__ == '__main__':
     h = Human_Move()
     h.start()
-    # TODO:input
     again = input("Let's play again? > ")
     h.quit_f(again)
+    if again.lower() != "yes":
+        h.quit_f("quit")
+
     while again.lower() == "yes":
         h = Human_Move()
+        h.ship_name = []
         h.start()
 
